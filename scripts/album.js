@@ -28,7 +28,6 @@ var getSongNumberCell = function(number) {
     return $('.song-item-number[data-song-number="' + number + '"]');
 }
 
-
 var createSongRow = function(songNumber, songName, songLength) {
     var template =
        '<tr class="album-view-song-item">'
@@ -99,7 +98,6 @@ var createSongRow = function(songNumber, songName, songLength) {
     return $row;
 };
 
-
 var setCurrentAlbum = function(album) {
     currentAlbum = album;
     var $albumTitle = $('.album-view-title');
@@ -124,10 +122,12 @@ var setCurrentAlbum = function(album) {
 var updateSeekBarWhileSongPlays = function() {
     if (currentSoundFile) {
         currentSoundFile.bind('timeupdate', function(event) {
-            var seekBarFillRatio = this.getTime() / this.getDuration();
+            var time = currentSoundFile.getTime();
+            var seekBarFillRatio = time / currentSoundFile.getDuration();
             var $seekBar = $('.seek-control .seek-bar');
 
             updateSeekPercentage($seekBar, seekBarFillRatio);
+            setCurrentTimeInPlayerBar(filterTimeCode(time));
         });
     }
 };
@@ -254,17 +254,32 @@ var previousSong = function() {
 };
 
 var updatePlayerBarSong = function() {
-
     $('.currently-playing .song-name').text(currentSongFromAlbum.title);
     $('.currently-playing .artist-name').text(currentAlbum.artist);
     $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + " - " + currentAlbum.artist);
     $('.main-controls .play-pause').html(playerBarPauseButton);
+    setTotalTimeInPlayerBar(currentSongFromAlbum.duration);
 };
 
+function setCurrentTimeInPlayerBar(currentTime) {
+  $('.current-time').text(currentTime);
+}
 
+function setTotalTimeInPlayerBar(totalTime) {
+  $('.total-time').text(totalTime);
+}
+
+function filterTimeCode(timeInSeconds) {
+  var time = parseFloat(timeInSeconds);
+  var minutes = Math.floor(time / 60);
+  var seconds = Math.floor(time % 60);
+  if (seconds < 10) {
+      seconds = "0" + seconds;
+  }
+  return minutes + ':' + seconds;
+}
 
 var toggle = function() {
-
    if (currentSoundFile.isPaused()) {
 //  If a song is paused and the play button is clicked in the player bar, it will:
         getSongNumberCell(currentlyPlayingSongNumber).html(pauseButtonTemplate);
@@ -281,12 +296,8 @@ var toggle = function() {
 // Change the HTML of the player bar's pause button to a play button.
          currentSoundFile.stop();
 // Pause the song
-
     }
-
 };
-
-
 
 var playButtonTemplate = '<a class="album-song-button"><span class="ion-play"></span></a>';
 var pauseButtonTemplate = '<a class="album-song-button"><span class="ion-pause"></span></a>';
