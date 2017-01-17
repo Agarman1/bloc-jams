@@ -20,8 +20,7 @@ var setVolume = function(volume) {
 
 var getSongNumberCell = function(number) {
     return $('.song-item-number[data-song-number="' + number + '"]');
-}
-
+};
 
 var createSongRow = function(songNumber, songName, songLength) {
     var template =
@@ -117,7 +116,62 @@ var updateSeekPercentage = function($seekBar, seekBarFillRatio) {
     var percentageString = offsetXPercent + '%';
     $seekBar.find('.fill').width(percentageString);
     $seekBar.find('.thumb').css({left: percentageString});
- };
+};
+
+var updateSeekBarWhileSongPlays = function() {
+  if (currentSoundFile) {
+      // #10
+      currentSoundFile.bind('timeupdate', function(event) {
+          // #11
+          var seekBarFillRatio = this.getTime() / this.getDuration();
+          var $seekBar = $('.seek-control .seek-bar');
+
+          updateSeekPercentage($seekBar, seekBarFillRatio);
+      });
+  }
+};
+
+var setupSeekBars = function() {
+  var $seekBars = $('.player-bar .seek-bar');
+
+    $seekBars.click(function(event) {
+        // #3
+        var offsetX = event.pageX - $(this).offset().left;
+        var barWidth = $(this).width();
+     
+        // #4
+        var seekBarFillRatio = offsetX / barWidth;
+
+        // #5
+        updateSeekPercentage($(this), seekBarFillRatio);
+    });
+    
+    $seekBars.find('.thumb').mousedown(function(event) {
+     // #8
+     var $seekBar = $(this).parent();
+
+     // #9
+     $(document).bind('mousemove.thumb', function(event){
+         var offsetX = event.pageX - $seekBar.offset().left;
+         var barWidth = $seekBar.width();
+         var seekBarFillRatio = offsetX / barWidth;
+
+         updateSeekPercentage($seekBar, seekBarFillRatio);
+     });
+
+     // #10
+     $(document).bind('mouseup.thumb', function() {
+         $(document).unbind('mousemove.thumb');
+         $(document).unbind('mouseup.thumb');
+     });
+   });
+};
+
+var seek = function(time) {
+  if (currentSoundFile) {
+    currentSoundFile.setTime(time);
+  }
+};
 
 var trackIndex = function(album, song) {
     return album.songs.indexOf(song);
@@ -250,5 +304,5 @@ $(document).ready(function() {
     $previousButton.click(previousSong);
     $nextButton.click(nextSong);
     $playpauseButton.click(toggle);
-
+    setupSeekBars();
 });
