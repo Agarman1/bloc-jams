@@ -138,6 +138,7 @@ var updateSeekBarWhileSongPlays = function() {
           var $seekBar = $('.seek-control .seek-bar');
 
           updateSeekPercentage($seekBar, seekBarFillRatio);
+
       });
   }
 };
@@ -276,6 +277,7 @@ var updatePlayerBarSong = function() {
 
 
 
+
 var toggle = function() {
 
    if (currentSoundFile == null) { // eat shit
@@ -297,6 +299,8 @@ var toggle = function() {
         currentSoundFile.play();
 // Play the song
         updateSeekBarWhileSongPlays();
+
+
 
     } else if (currentSoundFile) {
 // If the song is playing (so a current sound file exist), and the pause button is clicked
