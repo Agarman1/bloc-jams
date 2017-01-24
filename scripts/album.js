@@ -127,7 +127,7 @@ var updateSeekPercentage = function($seekBar, seekBarFillRatio) {
     $seekBar.find('.fill').width(percentageString);
     $seekBar.find('.thumb').css({left: percentageString});
 };
-// Holy Smokes!!!
+
 var updateSeekBarWhileSongPlays = function() {
   if (currentSoundFile) {
       // #10
@@ -150,6 +150,7 @@ var setupSeekBars = function() {
         var offsetX = event.pageX - $(this).offset().left;
         var barWidth = $(this).width();
 
+
         // #4
         var seekBarFillRatio = offsetX / barWidth;
 
@@ -162,6 +163,7 @@ var setupSeekBars = function() {
         // #5
         updateSeekPercentage($(this), seekBarFillRatio);
     });
+
 
     $seekBars.find('.thumb').mousedown(function(event) {
      // #8
