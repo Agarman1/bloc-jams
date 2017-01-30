@@ -29,7 +29,7 @@ var createSongRow = function(songNumber, songName, songLength) {
        '<tr class="album-view-song-item">'
      + '  <td class="song-item-number" data-song-number="' + songNumber + '">' + songNumber + '</td>'
      + '  <td class="song-item-title">' + songName + '</td>'
-     + '  <td class="song-item-duration">' + songLength + '</td>'
+     + '  <td class="song-item-duration">' + filterTimeCode(songLength) + '</td>'
      + '</tr>'
      ;
 
@@ -134,10 +134,13 @@ var updateSeekBarWhileSongPlays = function() {
       currentSoundFile.bind('timeupdate', function(event) {
           // #11
 
-          var seekBarFillRatio = this.getTime() / this.getDuration();
+          var time = currentSoundFile.getTime();
+          var seekBarFillRatio = time / this.getDuration();
           var $seekBar = $('.seek-control .seek-bar');
 
           updateSeekPercentage($seekBar, seekBarFillRatio);
+          setCurrentTimeInPlayerBar(filterTimeCode(time));
+
       });
   }
 };
@@ -272,9 +275,26 @@ var updatePlayerBarSong = function() {
     $('.currently-playing .artist-name').text(currentAlbum.artist);
     $('.currently-playing .artist-song-mobile').text(currentSongFromAlbum.title + " - " + currentAlbum.artist);
     $('.main-controls .play-pause').html(playerBarPauseButton);
+    setTotalTimeInPlayerBar(filterTimeCode(currentSongFromAlbum.duration));
 };
 
+function setCurrentTimeInPlayerBar(currentTime) {
+		$('.current-time').text(currentTime);
+}
 
+function setTotalTimeInPlayerBar(totalTime) {
+  		$('.total-time').text(totalTime);
+}
+
+function filterTimeCode(timeInSeconds) {
+    var time = parseFloat(timeInSeconds);
+    var minutes = Math.floor(time / 60);
+    var seconds = Math.floor(time % 60);
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+    return minutes + ':' + seconds;
+}
 
 var toggle = function() {
 
@@ -283,7 +303,7 @@ var toggle = function() {
      setSong(1);
      getSongNumberCell(currentlyPlayingSongNumber).html(pauseButtonTemplate);
      $('.main-controls .play-pause').html(playerBarPauseButton);
-     currentSoundFile.play();
+     currentSoundFile.play();u
      updateSeekBarWhileSongPlays();
      return;
    }
@@ -297,6 +317,8 @@ var toggle = function() {
         currentSoundFile.play();
 // Play the song
         updateSeekBarWhileSongPlays();
+
+
 
     } else if (currentSoundFile) {
 // If the song is playing (so a current sound file exist), and the pause button is clicked
